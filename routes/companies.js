@@ -12,11 +12,22 @@ const { Engineer, engineerJoi } = require("../models/Engineer")
 const checkId = require("../middleware/checkId")
 const checkAdmin = require("../middleware/checkAdmin")
 const validateId = require("../middleware/validateId")
+const { commentJoi, Comment } = require("../models/Comment")
 
 const req = require("express/lib/request")
+const { User } = require("../models/User")
 
 router.get("/profile", checkCompany, async (req, res) => {
-  const companies = await Company.findById(req.companyId).populate("project").populate("offer")
+  const companies = await Company.findById(req.companyId)
+    .populate("project")
+    .populate("offer")
+    .populate({
+      path: "comment",
+      populate: {
+        path: "owner",
+        select: "-password -email -like",
+      },
+    })
   res.json(companies)
 })
 
@@ -124,9 +135,14 @@ router.post("/login", validateBody(loginJoi), async (req, res) => {
 
 //get one company
 
-
 router.get("/company/:id", async (req, res) => {
-  const company = await Company.findById(req.params.id)
+  const company = await Company.findById(req.params.id).populate({
+    path: "comment",
+    populate: {
+      path: "owner",
+      select: "-password -email -like",
+    },
+  })
   res.json(company)
 })
 
@@ -142,27 +158,27 @@ router.get("/engineer", checkCompany, async (req, res) => {
   res.json(engineers)
 })
 
-router.post(":/profile", checkCompany, async (req, res) => {
-  const { name, avatar, description, projects } = req.body
-  try {
-    const result = profilCompanyJoi.validate(req.body)
-    if (!result.error) return res.status(400).send(result.error.details[0].message)
+// // router.post(":/profile", checkCompany, async (req, res) => {
+//   const { name, avatar, description, projects } = req.body
+//   try {
+//     const result = profilCompanyJoi.validate(req.body)
+//     if (!result.error) return res.status(400).send(result.error.details[0].message)
 
-    const company = new Company({
-      name,
-      avatar,
-      description,
-      projects,
-    })
+//     const company = new Company({
+//       name,
+//       avatar,
+//       description,
+//       projects,
+//     })
 
-    await company.save()
-    res.json(company)
-  } catch (error) {
-    res.status(500).send(error.message)
-  }
-})
+//     await company.save()
+//     res.json(company)
+//   } catch (error) {
+//     res.status(500).send(error.message)
+//   }
+// })
 
-router.put("/", checkCompany, validateBody(profilEditCompanyJoi), async (req, res) => {
+router.put("/profile", checkCompany, validateBody(profilEditCompanyJoi), async (req, res) => {
   try {
     const { name, avatar, email, projects } = req.body
 
@@ -226,23 +242,88 @@ router.get("/:id/verify", async (req, res) => {
 //verifiedCompanies
 router.get("/verifiedCompanies", async (req, res) => {
   const companies = await Company.find({ verified: true })
+    .populate({
+      path: "comment",
+      populate: {
+        path: "owner",
+        select: "-password -email -like",
+      },
+    })
     .populate("project")
     .populate("engineer")
-    .populate({
-      path: "project",
-      select: "-__v",
-      populate: {
-        path: "comment",
-      },
-    })
-    .populate({
-      path: "project",
-      select: "-__v",
-      populate: {
-        path: "likes",
-      },
-    })
+    // .populate({
+    //   path: "project",
+    //   select: "-__v",
+    //   populate: {
+    //     path: "likes",
+    //   },
+    // })
   res.json(companies)
+})
+
+//add comment
+router.post("/:companyId/comments", checkUser, validateId("companyId"), validateBody(commentJoi), async (req, res) => {
+  try {
+    const { comment } = req.body
+    const company = await Company.findById(req.params.companyId)
+    if (!company) return res.status(404).send("company not found")
+
+    const newComment = new Comment({ comment, owner: req.userId, companyId: req.params.companyId })
+
+    await Company.findByIdAndUpdate(req.params.companyId, { $push: { comment: newComment } })
+    await newComment.save()
+
+    res.json(newComment)
+  } catch (error) {
+    res.status(500).send(error.message)
+  }
+})
+
+//edit comment
+router.put(
+  "/:companyId/comments/:commentId",
+  checkUser,
+  validateId("companyId", "commentId"),
+  validateBody(commentJoi),
+  async (req, res) => {
+    try {
+      const company = await Company.findById(req.params.companyId)
+      if (!company) return res.status(404).send("company not found")
+      const { comment } = req.body
+
+      const commentFound = await Comment.findById(req.params.commentId)
+      if (!commentFound) return res.status(400).send("comment not found")
+
+      const updatedcomment = await Comment.findByIdAndUpdate(req.params.commentId, { $set: { comment } }, { new: true })
+
+      res.json(updatedcomment)
+    } catch (error) {
+      res.status(500).send(error.message)
+    }
+  }
+)
+
+//delet comment
+router.delete("/:companyId/comments/:commentId", checkUser, validateId("companyId", "commentId"), async (req, res) => {
+  try {
+    const company = await Company.findById(req.params.companyId)
+    if (!company) return res.status(404).send("company not found")
+
+    const commentFound = await Comment.findById(req.params.commentId)
+    if (!commentFound) return res.status(400).send("comment not found")
+
+    const user = await User.findById(req.userId)
+    if (commentFound.owner != req.userId) return res.status(403).send("unauthorized action")
+
+    await Company.findByIdAndUpdate(req.params.companyId, { $pull: { comments: commentFound._id } })
+
+    await Comment.findByIdAndRemove(req.params.commentId)
+
+    res.send("comment is removed")
+  } catch (error) {
+    console.log(error)
+    res.status(500).send(error.message)
+  }
 })
 
 module.exports = router

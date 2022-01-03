@@ -27,6 +27,12 @@ const companysSchema = new mongoose.Schema({
       ref: "Offer",
     },
   ],
+  comment: [
+    {
+      type: mongoose.Types.ObjectId,
+      ref: "Comment",
+    },
+  ],
 })
 
 // const projectAddJoi = Joi.object({

@@ -9,7 +9,7 @@ const validateBody = require("../middleware/validateBody")
 const validateId = require("../middleware/validateId")
 const { Company } = require("../models/Company")
 const { Project, projectAddJoi, projectEditJoi } = require("../models/Project")
-const { commentJoi, Comment } = require("../models/Comment")
+// const { commentJoi, Comment } = require("../models/Comment")
 const { User } = require("../models/User")
 const checkAdmin = require("../middleware/checkAdmin")
 const router = express.Router()
@@ -20,13 +20,13 @@ router.get("/", async (req, res) => {
     //-------------
 
     // .populate("engineers")
-    .populate({
-      path: "comment",
-      populate: {
-        path: "owner",
-        select: "-password -email -like",
-      },
-    })
+    // .populate({
+    //   path: "comment",
+    //   populate: {
+    //     path: "owner",
+    //     select: "-password -email -like",
+    //   },
+    // })
   res.json(projects)
 })
 
@@ -110,71 +110,71 @@ router.delete("/:id", checkCompany, checkId, async (req, res) => {
 
 /*add comment */
 
-router.post("/:projectId/comments", checkUser, validateId("projectId"), validateBody(commentJoi), async (req, res) => {
-  try {
-    const { comment } = req.body
-    const project = await Project.findById(req.params.projectId)
-    if (!project) return res.status(404).send("project not found")
+// router.post("/:projectId/comments", checkUser, validateId("projectId"), validateBody(commentJoi), async (req, res) => {
+//   try {
+//     const { comment } = req.body
+//     const project = await Project.findById(req.params.projectId)
+//     if (!project) return res.status(404).send("project not found")
 
-    const newComment = new Comment({ comment, owner: req.userId, projectId: req.params.projectId })
+//     const newComment = new Comment({ comment, owner: req.userId, projectId: req.params.projectId })
 
-    await Project.findByIdAndUpdate(req.params.projectId, { $push: { comment: newComment } })
-    await newComment.save()
+//     await Project.findByIdAndUpdate(req.params.projectId, { $push: { comment: newComment } })
+//     await newComment.save()
 
-    res.json(newComment)
-  } catch (error) {
-    res.status(500).send(error.message)
-  }
-})
+//     res.json(newComment)
+//   } catch (error) {
+//     res.status(500).send(error.message)
+//   }
+// })
 
 /*edit comment */
 
-router.put(
-  "/:projectId/comments/:commentId",
-  checkUser,
-  validateId("projectId", "commentId"),
-  validateBody(commentJoi),
-  async (req, res) => {
-    try {
-      const project = await Project.findById(req.params.projectId)
-      if (!project) return res.status(404).send("project not found")
-      const { comment } = req.body
+// router.put(
+//   "/:projectId/comments/:commentId",
+//   checkUser,
+//   validateId("projectId", "commentId"),
+//   validateBody(commentJoi),
+//   async (req, res) => {
+//     try {
+//       const project = await Project.findById(req.params.projectId)
+//       if (!project) return res.status(404).send("project not found")
+//       const { comment } = req.body
 
-      const commentFound = await Comment.findById(req.params.commentId)
-      if (!commentFound) return res.status(400).send("comment not found")
+//       const commentFound = await Comment.findById(req.params.commentId)
+//       if (!commentFound) return res.status(400).send("comment not found")
 
-      const updatedcomment = await Comment.findByIdAndUpdate(req.params.commentId, { $set: { comment } }, { new: true })
+//       const updatedcomment = await Comment.findByIdAndUpdate(req.params.commentId, { $set: { comment } }, { new: true })
 
-      res.json(updatedcomment)
-    } catch (error) {
-      res.status(500).send(error.message)
-    }
-  }
-)
+//       res.json(updatedcomment)
+//     } catch (error) {
+//       res.status(500).send(error.message)
+//     }
+//   }
+// )
 
 /*delet comment */
 
-router.delete("/:projectId/comments/:commentId", checkUser, validateId("projectId", "commentId"), async (req, res) => {
-  try {
-    const project = await Project.findById(req.params.projectId)
-    if (!project) return res.status(404).send("project not found")
+// router.delete("/:projectId/comments/:commentId", checkUser, validateId("projectId", "commentId"), async (req, res) => {
+//   try {
+//     const project = await Project.findById(req.params.projectId)
+//     if (!project) return res.status(404).send("project not found")
 
-    const commentFound = await Comment.findById(req.params.commentId)
-    if (!commentFound) return res.status(400).send("comment not found")
+//     const commentFound = await Comment.findById(req.params.commentId)
+//     if (!commentFound) return res.status(400).send("comment not found")
 
-    const user = await User.findById(req.userId)
-    if (commentFound.owner != req.userId) return res.status(403).send("unauthorized action")
+//     const user = await User.findById(req.userId)
+//     if (commentFound.owner != req.userId) return res.status(403).send("unauthorized action")
 
-    await Project.findByIdAndUpdate(req.params.projectId, { $pull: { comments: commentFound._id } })
+//     await Project.findByIdAndUpdate(req.params.projectId, { $pull: { comments: commentFound._id } })
 
-    await Comment.findByIdAndRemove(req.params.commentId)
+//     await Comment.findByIdAndRemove(req.params.commentId)
 
-    res.send("comment is removed")
-  } catch (error) {
-    console.log(error)
-    res.status(500).send(error.message)
-  }
-})
+//     res.send("comment is removed")
+//   } catch (error) {
+//     console.log(error)
+//     res.status(500).send(error.message)
+//   }
+// })
 
 /*Like */
 router.get("/:projectId/likes", checkUser, validateId("projectId"), async (req, res) => {

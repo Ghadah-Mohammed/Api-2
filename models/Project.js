@@ -17,12 +17,7 @@ const projectSchema = new mongoose.Schema({
       ref: "User",
     },
   ],
-  comment: [
-    {
-      type: mongoose.Types.ObjectId,
-      ref: "Comment",
-    },
-  ],
+  
 })
 
 const projectAddJoi = Joi.object({

@@ -71,29 +71,20 @@ router.get("/Companies", async (req, res) => {
     .populate("project")
     .populate("engineer")
     .populate({
-      path: "project",
-      select: "-__v",
+      path: "comment",
       populate: {
-        path: "comment",
-      },
-    })
-    .populate({
-      path: "project",
-      select: "-__v",
-      populate: {
-        path: "likes",
+        path: "owner",
+        select: "-password -email -like",
       },
     })
   res.json(companies)
 })
-
 
 // get all users
 router.get("/Users", async (req, res) => {
   const users = await User.find()
   res.json(users)
 })
-
 
 //delet user
 
@@ -118,7 +109,6 @@ router.delete("/:projectId/comments/:commentId", checkAdmin, validateId("project
   }
 })
 
-
 // add admin
 router.post("/add-admin", checkAdmin, async (req, res) => {
   try {
@@ -137,7 +127,7 @@ router.post("/add-admin", checkAdmin, async (req, res) => {
       firstName,
       lastName,
       email,
-      password:hash,
+      password: hash,
       avatar,
       // role: "Admin",
     })
