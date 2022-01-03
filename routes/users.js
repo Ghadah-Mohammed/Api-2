@@ -53,7 +53,7 @@ router.post("/login", validateBody(loginJoi), async (req, res) => {
 })
 
 router.get("/getprofile", checkUser, async (req, res) => {
-  const user = await User.findById(req.userId).populate("like")
+  const user = await User.findById(req.userId).populate("likes")
   res.json(user)
 })
 

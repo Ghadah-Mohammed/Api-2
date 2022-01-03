@@ -17,16 +17,16 @@ const router = express.Router()
 router.get("/", async (req, res) => {
   const projects = await Project.find()
 
-    //-------------
+  //-------------
 
-    // .populate("engineers")
-    // .populate({
-    //   path: "comment",
-    //   populate: {
-    //     path: "owner",
-    //     select: "-password -email -like",
-    //   },
-    // })
+  // .populate("engineers")
+  // .populate({
+  //   path: "comment",
+  //   populate: {
+  //     path: "owner",
+  //     select: "-password -email -like",
+  //   },
+  // })
   res.json(projects)
 })
 
@@ -182,6 +182,8 @@ router.get("/:projectId/likes", checkUser, validateId("projectId"), async (req, 
     let project = await Project.findById(req.params.projectId)
     if (!project) return res.status(404).send("project not found")
 
+    console.log(project)
+
     const userFound = project.likes.find(like => like == req.userId)
     if (userFound) {
       await Project.findByIdAndUpdate(req.params.projectId, { $pull: { likes: req.userId } })
@@ -193,7 +195,7 @@ router.get("/:projectId/likes", checkUser, validateId("projectId"), async (req, 
       res.send("project liked")
     }
   } catch (error) {
-    res.status(500).send(error.massage)
+    res.status(500).send(error.message)
   }
 })
 

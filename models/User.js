@@ -7,7 +7,7 @@ const UserSchema = new mongoose.Schema({
   email: String,
   password: String,
   avatar: String,
-  like: [
+  likes: [
     {
       type: mongoose.Types.ObjectId,
       ref: "Project",
