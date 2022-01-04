@@ -15,7 +15,7 @@ const checkAdmin = require("../middleware/checkAdmin")
 const router = express.Router()
 
 router.get("/", async (req, res) => {
-  const projects = await Project.find()
+  const projects = await Project.find().populate("companyId")
 
   //-------------
 
