@@ -10,8 +10,8 @@ const AdminSchema = new mongoose.Schema({
 })
 
 const signupJoi = Joi.object({
-  firstName: Joi.string().min(2).max(20).required(),
-  lastName: Joi.string().min(2).max(20).required(),
+  firstName: Joi.string().min(2).max(30).required(),
+  lastName: Joi.string().min(2).max(30).required(),
   email: Joi.string().email().required(),
   password: Joi.string().min(6).max(20).required(),
   avatar: Joi.string().uri().min(6).max(1000).required(),

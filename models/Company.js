@@ -52,7 +52,7 @@ const signupJoi = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().min(6).max(20).required(),
   avatar: Joi.string().uri().min(6).max(1000).required(),
-  description: Joi.string().min(2).max(2000).required(),
+  description: Joi.string().min(2).max(2000),
 })
 
 const loginJoi = Joi.object({
@@ -62,13 +62,15 @@ const loginJoi = Joi.object({
 const profilCompanyJoi = Joi.object({
   name: Joi.string().min(2).max(100).required(),
   avatar: Joi.string().uri().min(6).max(1000).required(),
-  description: Joi.string().min(6).max(1000).required(),
+  description: Joi.string().min(6).max(1000),
+  password: Joi.string().min(6).max(20),
 })
 
 const profilEditCompanyJoi = Joi.object({
   name: Joi.string().min(2).max(100),
   avatar: Joi.string().uri().min(6).max(1000),
   description: Joi.string().min(6).max(1000),
+  password: Joi.string().min(6).max(20),
 })
 
 const Company = mongoose.model("Company", companysSchema)

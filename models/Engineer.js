@@ -8,7 +8,7 @@ const EngineerSchema = new mongoose.Schema({
 
 const engineerJoi = Joi.object({
   name: Joi.string().min(2).max(20).required(),
-  photo: Joi.string().uri().min(5).max(1000),
+  photo: Joi.string().uri().min(5).max(1000).required(),
 })
 
 const Engineer = mongoose.model("Engineer", EngineerSchema)

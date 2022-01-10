@@ -187,7 +187,7 @@ router.put("/profile", checkCompany, validateBody(profilEditCompanyJoi), async (
       { $set: { name, avatar, email, projects } },
       { new: true }
     )
-    if (!company) return res.status(400).send("project not found")
+    if (!company) return res.status(400).send("company not found")
     res.json(company)
   } catch (error) {
     res.status(500).send(error.message)
@@ -199,6 +199,8 @@ router.delete("/:id", checkAdmin, checkId, async (req, res) => {
   try {
     const company = await Company.findByIdAndRemove(req.params.id)
     if (!company) return res.status(404).send("company not found")
+
+  await Project.deleteMany({companyId:req.params.id})
     res.send("company is remove")
   } catch (error) {
     res.status(500).send(error.message)
