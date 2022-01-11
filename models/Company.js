@@ -70,7 +70,7 @@ const profilEditCompanyJoi = Joi.object({
   name: Joi.string().min(2).max(100),
   avatar: Joi.string().uri().min(6).max(1000),
   description: Joi.string().min(6).max(1000),
-  password: Joi.string().min(6).max(20),
+  password: Joi.string().min(6).max(20).allow(""),
 })
 
 const Company = mongoose.model("Company", companysSchema)

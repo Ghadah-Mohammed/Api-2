@@ -82,10 +82,12 @@ router.put("/:id", checkCompany, checkId, validateBody(projectEditJoi), async (r
 //delet project
 router.delete("/:id", checkCompany, checkId, async (req, res) => {
   try {
-    if (project.companyId != req.companyId) return res.status(403).send("unauthorized action")
 
     const project = await Project.findByIdAndRemove(req.params.id)
     if (!project) return res.status(404).send("project not found")
+    if (project.companyId != req.companyId) return res.status(403).send("unauthorized action")
+
+
     res.send("project is remove")
   } catch (error) {
     res.status(500).send(error.message)

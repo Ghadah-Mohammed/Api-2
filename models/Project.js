@@ -17,7 +17,6 @@ const projectSchema = new mongoose.Schema({
       ref: "User",
     },
   ],
-  
 })
 
 const projectAddJoi = Joi.object({
@@ -28,7 +27,7 @@ const projectAddJoi = Joi.object({
 
 const projectEditJoi = Joi.object({
   title: Joi.string().min(2).max(50),
-  photo: Joi.array().items().min(1).max(1000),
+  photo: Joi.string().uri().min(1).max(1000),
   description: Joi.string().min(2).max(1000),
 })
 

@@ -13,6 +13,10 @@ const UserSchema = new mongoose.Schema({
       ref: "Project",
     },
   ],
+  offers:[
+    {type: mongoose.Types.ObjectId,
+      ref: "Offer",}
+  ]
   
 })
 

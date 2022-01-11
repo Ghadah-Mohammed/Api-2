@@ -218,6 +218,7 @@ router.post("/:companyId/sendoffer", checkUser, validateBody(offerJoi), async (r
   })
   await offer.save()
   await Company.findByIdAndUpdate(req.params.companyId, { $push: { offer: offer._id } })
+  await User.findByIdAndUpdate(req.userId,{$push:{offers:offer._id}})
 
   res.json(offer)
 })
