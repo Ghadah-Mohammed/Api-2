@@ -17,6 +17,12 @@ const projectSchema = new mongoose.Schema({
       ref: "User",
     },
   ],
+  offerId:[
+    {
+      type: mongoose.Types.ObjectId,
+      ref: "Offer"
+    }
+  ]
 })
 
 const projectAddJoi = Joi.object({

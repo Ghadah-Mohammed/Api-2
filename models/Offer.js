@@ -16,6 +16,12 @@ const offerSchema = new mongoose.Schema({
     type: String,
     enum: ["progress", "pending", "refused", "finished"],
   },
+  projectId: 
+    {
+      type: mongoose.Types.ObjectId,
+      ref: "Project",
+    },
+  
 })
 
 const offerJoi = Joi.object({

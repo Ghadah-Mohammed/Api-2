@@ -28,6 +28,7 @@ router.get("/profile", checkCompany, async (req, res) => {
         select: "-password -email -like",
       },
     })
+    .populate("engineer")
   res.json(companies)
 })
 
@@ -54,6 +55,21 @@ router.post("/add-engineer", checkCompany, validateBody(engineerJoi), async (req
   await Company.findByIdAndUpdate(req.companyId, { $push: { engineer: engineer._id } })
 
   res.json(engineer)
+})
+
+//delete engineering
+router.delete("/engineerdelet/:id", checkCompany, checkId, async (req, res) => {
+  try {
+    await Company.findByIdAndUpdate(req.companyId, { $pull: { engineer: req.params.id } })
+
+    const engineer = await Engineer.findById(req.params.id)
+    if (!engineer) return res.status(404).send("engineer is not found")
+
+    engineer.remove()
+    res.json("engineer removed")
+  } catch (error) {
+    res.status(500).send(error.message)
+  }
 })
 
 //signup Company
@@ -200,25 +216,45 @@ router.delete("/:id", checkAdmin, checkId, async (req, res) => {
     const company = await Company.findByIdAndRemove(req.params.id)
     if (!company) return res.status(404).send("company not found")
 
-  await Project.deleteMany({companyId:req.params.id})
+    await Project.deleteMany({ companyId: req.params.id })
     res.send("company is remove")
   } catch (error) {
     res.status(500).send(error.message)
   }
 })
 
-router.post("/:companyId/sendoffer", checkUser, validateBody(offerJoi), async (req, res) => {
+//delete Offer
+router.delete("/offer/:id", checkId, async (req, res) => {
+  try {
+    const offer = await Offer.findByIdAndRemove(req.params.id)
+    if (!offer) return res.status(404).send("offer is not found")
+
+    await Project.deleteMany({ offerId: req.params.id })
+    res.send("offer is remove")
+  } catch (error) {
+    res.status(500).send(error.message)
+  }
+})
+
+//send offer user
+router.post("/:companyId/:projectId/sendoffer", checkUser, validateBody(offerJoi), async (req, res) => {
   const { title, description } = req.body
   const offer = new Offer({
     title,
     description,
     userId: req.userId,
+    projectId: req.params.projectId,
     companyId: req.params.companyId,
     status: "pending",
   })
   await offer.save()
+  const user = await User.findById(req.userId).populate("offers")
+  const userFound = user.offers.find(user => user.projectId == req.params.projectId)
+  console.log(userFound)
+  if (userFound) return res.status(403).send("user already sent offer for this project")
+
   await Company.findByIdAndUpdate(req.params.companyId, { $push: { offer: offer._id } })
-  await User.findByIdAndUpdate(req.userId,{$push:{offers:offer._id}})
+  await User.findByIdAndUpdate(req.userId, { $push: { offers: offer._id } })
 
   res.json(offer)
 })
@@ -254,13 +290,13 @@ router.get("/verifiedCompanies", async (req, res) => {
     })
     .populate("project")
     .populate("engineer")
-    // .populate({
-    //   path: "project",
-    //   select: "-__v",
-    //   populate: {
-    //     path: "likes",
-    //   },
-    // })
+  // .populate({
+  //   path: "project",
+  //   select: "-__v",
+  //   populate: {
+  //     path: "likes",
+  //   },
+  // })
   res.json(companies)
 })
 
