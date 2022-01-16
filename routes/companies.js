@@ -20,7 +20,13 @@ const { User } = require("../models/User")
 router.get("/profile", checkCompany, async (req, res) => {
   const companies = await Company.findById(req.companyId)
     .populate("project")
-    .populate("offer")
+    .populate({
+      path: "offer",
+      populate: {
+        path: "userId",
+        select: "-password  -like",
+      },
+    })
     .populate({
       path: "comment",
       populate: {
@@ -196,11 +202,13 @@ router.get("/engineer", checkCompany, async (req, res) => {
 
 router.put("/profile", checkCompany, validateBody(profilEditCompanyJoi), async (req, res) => {
   try {
-    const { name, avatar, email, projects } = req.body
-
+    const { name, avatar, description, password } = req.body
+    const salt = await bcrypt.genSalt(10)
+    let hash
+    if (password) hash = await bcrypt.hash(password, salt)
     const company = await Company.findByIdAndUpdate(
       req.companyId,
-      { $set: { name, avatar, email, projects } },
+      { $set: { name, avatar, description, password: hash } },
       { new: true }
     )
     if (!company) return res.status(400).send("company not found")
@@ -217,6 +225,7 @@ router.delete("/:id", checkAdmin, checkId, async (req, res) => {
     if (!company) return res.status(404).send("company not found")
 
     await Project.deleteMany({ companyId: req.params.id })
+    await Offer.deleteMany({ companyId: req.params.id })
     res.send("company is remove")
   } catch (error) {
     res.status(500).send(error.message)
