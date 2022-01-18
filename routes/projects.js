@@ -190,11 +190,11 @@ router.get("/:projectId/likes", checkUser, validateId("projectId"), async (req, 
     if (userFound) {
       await Project.findByIdAndUpdate(req.params.projectId, { $pull: { likes: req.userId } })
       await User.findByIdAndUpdate(req.userId, { $pull: { likes: req.params.projectId } })
-      res.send("removed like from project")
+      res.send("removed from favourites")
     } else {
       await Project.findByIdAndUpdate(req.params.projectId, { $push: { likes: req.userId } })
       await User.findByIdAndUpdate(req.userId, { $push: { likes: req.params.projectId } })
-      res.send("project liked")
+      res.send("project favourited")
     }
   } catch (error) {
     res.status(500).send(error.message)

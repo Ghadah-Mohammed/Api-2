@@ -13,7 +13,11 @@ const UserSchema = new mongoose.Schema({
       ref: "Project",
     },
   ],
-  offers: [{ type: mongoose.Types.ObjectId, ref: "Offer" }],
+  offers:[
+    {type: mongoose.Types.ObjectId,
+      ref: "Offer",}
+  ]
+  
 })
 
 const signupJoi = Joi.object({
@@ -33,6 +37,7 @@ const profileJoi = Joi.object({
   lastName: Joi.string().min(2).max(100),
   password: Joi.string().min(6).max(20).allow(""),
   avatar: Joi.string().uri().min(6).max(1000),
+
 })
 
 const User = mongoose.model("User", UserSchema)
