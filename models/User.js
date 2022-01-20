@@ -6,18 +6,17 @@ const UserSchema = new mongoose.Schema({
   lastName: String,
   email: String,
   password: String,
-  avatar: String,
+  avatar: {
+    type: String,
+    default: "https://icon-library.com/images/profile-image-icon/profile-image-icon-0.jpg",
+  },
   likes: [
     {
       type: mongoose.Types.ObjectId,
       ref: "Project",
     },
   ],
-  offers:[
-    {type: mongoose.Types.ObjectId,
-      ref: "Offer",}
-  ]
-  
+  offers: [{ type: mongoose.Types.ObjectId, ref: "Offer" }],
 })
 
 const signupJoi = Joi.object({
@@ -25,7 +24,7 @@ const signupJoi = Joi.object({
   lastName: Joi.string().min(2).max(20).required(),
   email: Joi.string().email().required(),
   password: Joi.string().min(6).max(20).required(),
-  avatar: Joi.string().uri().min(6).max(1000).required(),
+  avatar: Joi.string().uri().min(6).max(1000),
 })
 
 const loginJoi = Joi.object({
@@ -37,7 +36,6 @@ const profileJoi = Joi.object({
   lastName: Joi.string().min(2).max(100),
   password: Joi.string().min(6).max(20).allow(""),
   avatar: Joi.string().uri().min(6).max(1000),
-
 })
 
 const User = mongoose.model("User", UserSchema)
