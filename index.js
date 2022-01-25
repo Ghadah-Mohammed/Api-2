@@ -9,6 +9,7 @@ const admin = require("./routes/admin")
 const projects = require("./routes/projects")
 const companies = require("./routes/companies")
 require("dotenv").config()
+
 mongoose
   .connect(`mongodb+srv://Ghadah:gh8489gh8489@cluster0.nmjrq.mongodb.net/companiesDB?retryWrites=true&w=majority`)
   .then(() => {
