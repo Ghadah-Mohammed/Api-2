@@ -14,7 +14,7 @@ const offerSchema = new mongoose.Schema({
   description: String,
   status: {
     type: String,
-    enum: ["progress", "pending", "refused", "finished"],
+    enum: ["progress", "pending", "refused"],
   },
   projectId: 
     {

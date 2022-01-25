@@ -64,6 +64,9 @@ router.post("/login", validateBody(loginJoi), async (req, res) => {
 //   const companies = await Company.find({ verified: true }).populate("project").populate("engineer").populate("offer")
 //   res.json(companies)
 // })
+
+
+
 // get all company
 
 router.get("/Companies", async (req, res) => {
@@ -86,7 +89,7 @@ router.get("/Users", async (req, res) => {
   res.json(users)
 })
 
-//delet user
+
 
 /*delet comment */
 

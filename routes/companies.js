@@ -49,8 +49,6 @@ router.get("/engineers", async (req, res) => {
   res.json(engineers)
 })
 
-
-
 //addengineer
 router.post("/add-engineer", checkCompany, validateBody(engineerJoi), async (req, res) => {
   const { name, photo } = req.body
@@ -133,30 +131,6 @@ router.post("/login", validateBody(loginJoi), async (req, res) => {
   }
 })
 
-// router.get("/", async (req, res) => {
-//   const companies = await Company.find()
-//   res.json(companies)
-// })
-
-// router.get(":/allproject", async (req, res) => {
-//   const project = await Project.find()
-//   res.json(project)
-// })
-
-//getproject//.................//.......................//.......................//
-
-// router.get("/projects", checkCompany, async (req, res) => {
-//   const projects = await Project.find().populate("companyId")
-//   res.json(projects)
-// })
-
-//get one project//...................//...................//....................//
-
-// router.get("/projects/:id", async (req, res) => {
-//   const projects = await Project.findById(req.params.id).populate("companyId")
-//   res.json(projects)
-// })
-
 //get one company
 
 router.get("/company/:id", async (req, res) => {
@@ -182,25 +156,7 @@ router.get("/engineer", checkCompany, async (req, res) => {
   res.json(engineers)
 })
 
-// // router.post(":/profile", checkCompany, async (req, res) => {
-//   const { name, avatar, description, projects } = req.body
-//   try {
-//     const result = profilCompanyJoi.validate(req.body)
-//     if (!result.error) return res.status(400).send(result.error.details[0].message)
-
-//     const company = new Company({
-//       name,
-//       avatar,
-//       description,
-//       projects,
-//     })
-
-//     await company.save()
-//     res.json(company)
-//   } catch (error) {
-//     res.status(500).send(error.message)
-//   }
-// })
+//edit profile
 
 router.put("/profile", checkCompany, validateBody(profilEditCompanyJoi), async (req, res) => {
   try {
@@ -260,8 +216,8 @@ router.post("/:companyId/:projectId/sendoffer", checkUser, validateBody(offerJoi
   })
   await offer.save()
   const user = await User.findById(req.userId).populate("offers")
+
   const userFound = user.offers.find(user => user.projectId == req.params.projectId)
-  console.log(userFound)
   if (userFound) return res.status(403).send("user already sent offer for this project")
 
   await Company.findByIdAndUpdate(req.params.companyId, { $push: { offer: offer._id } })
