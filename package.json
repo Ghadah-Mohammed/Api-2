@@ -18,6 +18,9 @@
     "mongoose": "^6.1.2",
     "nodemon": "^2.0.15"
   },
+  "engines": {
+    "node": "16.x"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Ghadah-Mohammed/Api-2.git"
