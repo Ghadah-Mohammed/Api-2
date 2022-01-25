@@ -27,6 +27,7 @@ app.use("/api/auth", users)
 app.use("/api/company", companies)
 app.use("/api/admin", admin)
 app.use("/api/project", projects)
-app.listen(5000, () => {
+
+app.listen(process.env.PORT || 5000, () => {
   console.log("server is listenin on port :" + 5000)
 })
